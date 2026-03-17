@@ -1,0 +1,6 @@
+@CrushingPlantApi_HostAddress = http://localhost:5150
+
+GET {{CrushingPlantApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
