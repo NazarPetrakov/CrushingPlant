@@ -1,0 +1,20 @@
+name: crushing-plant
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${DEFAULT_DB_NAME}
+    ports:
+      - 5432:5432
+    volumes:
+      - db-volume:/var/lib/postgresql
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+volumes:
+  db-volume:
