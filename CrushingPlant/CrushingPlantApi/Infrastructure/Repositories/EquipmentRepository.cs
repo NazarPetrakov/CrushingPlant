@@ -35,5 +35,25 @@ namespace CrushingPlantApi.Infrastructure.Repositories
             return result;
         }
 
+        public async Task UpdateEquipmentsStatusRandomlyAsync()
+        {
+            await using var command = _dataSource.CreateCommand(EquipmentSqlCommands.UpdateStatusesRandomly);
+
+            await command.ExecuteNonQueryAsync();
+        }
+
+        public async Task UpdateStatusAsync(string status, string equipmentId)
+        {
+            await using var command = _dataSource.CreateCommand();
+
+            command.CommandText = EquipmentSqlCommands.UpdateStatusById;
+            command.Parameters.Add(new NpgsqlParameter { Value = status });
+            command.Parameters.Add(new NpgsqlParameter { Value = DateTime.UtcNow });
+            command.Parameters.Add(new NpgsqlParameter { Value = equipmentId });
+
+            await command.ExecuteNonQueryAsync();
+        }
+
+
     }
 }

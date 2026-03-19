@@ -19,6 +19,20 @@
                 WHERE equipment_id = ($1)
                 """;
 
+        public static string UpdateConveyorsRandomly = """
+                UPDATE conveyor_metrics
+                SET "speed_m/s" = CASE
+                    WHEN "speed_m/s" IS NULL THEN 1.5
 
+                    WHEN random() > 0.8 THEN 
+                        "speed_m/s" + 
+                        (CASE 
+                            WHEN random() < 0.5 THEN 0.1
+                            ELSE -0.1
+                        END)
+
+                    ELSE "speed_m/s"
+                END;
+                """;
     }
 }

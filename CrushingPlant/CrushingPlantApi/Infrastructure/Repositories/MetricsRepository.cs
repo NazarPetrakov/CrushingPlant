@@ -13,6 +13,13 @@ namespace CrushingPlantApi.Infrastructure.Repositories
             _dataSource = dataSource;
         }
 
+        public async Task UpdateConveyersMetricsRandomlyAsync()
+        {
+            await using var command = _dataSource.CreateCommand(MetricsSqlCommands.UpdateConveyorsRandomly);
+
+            await command.ExecuteNonQueryAsync();
+        }
+
         public async Task<CrusherMetrics?> GetCrusherMetricsAsync(string equipmentId)
         {
             return await GetSingleMetricsAsync(MetricsSqlCommands.SelectCrusherMetricsById, equipmentId,
