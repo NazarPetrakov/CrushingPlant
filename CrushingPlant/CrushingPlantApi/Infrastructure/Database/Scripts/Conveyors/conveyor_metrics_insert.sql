@@ -1,6 +1,6 @@
-﻿INSERT INTO conveyor_metrics (id, equipment_id, speed) VALUES
-('cm-conv-k-1',  'conv-k-1',  NULL),
-('cm-conv-k-2',  'conv-k-2',  NULL),
-('cm-conv-m-1',  'conv-m-1',  NULL),
-('cm-conv-m-2',  'conv-m-2',  NULL),
-('cm-conv-m-15', 'conv-m-15', NULL);
+﻿INSERT INTO conveyor_metrics (equipment_id, "speed_m/s") VALUES
+('conv-k-1',  NULL),
+('conv-k-2',  NULL),
+('conv-m-1',  NULL),
+('conv-m-2',  NULL),
+('conv-m-15', NULL);

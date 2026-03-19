@@ -1,6 +1,5 @@
 ﻿CREATE TABLE crusher_metrics (
-   id character varying (64) PRIMARY KEY,
-   equipment_id character varying (64) NOT NULL UNIQUE REFERENCES equipments(id) ON DELETE CASCADE,
+   equipment_id character varying (64) PRIMARY KEY REFERENCES equipments(id) ON DELETE CASCADE,
    temperature_celsius smallint NULL,
    load_percentage smallint NULL,
    power_kw smallint NULL,
