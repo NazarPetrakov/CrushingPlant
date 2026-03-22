@@ -8,6 +8,8 @@ builder.Services.AddOpenApi();
 
 var configuration = builder.Configuration;
 
+builder.Services.AddCors();
+
 builder.Services.AddNpgsqlDataSource(configuration.GetConnectionString("PostgresConnection") ?? "");
 builder.Services.AddScoped<EquipmentRepository>();
 builder.Services.AddScoped<MetricsRepository>();
@@ -20,6 +22,13 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseCors(policy =>
+{
+    policy.WithOrigins("http://localhost:4200")
+           .AllowAnyMethod()
+           .AllowCredentials()
+           .AllowAnyHeader();
+});
 app.UseHttpsRedirection();
 
 app.MapEquipmentEndpoints();

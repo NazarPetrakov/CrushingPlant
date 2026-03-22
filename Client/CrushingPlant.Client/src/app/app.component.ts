@@ -1,12 +1,17 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, signal } from '@angular/core';
+import { SchemaComponent } from './schema/schema.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [SchemaComponent],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
+  standalone: true,
 })
 export class AppComponent {
-  title = 'CrushingPlant.Client';
+  isAnimationStart = signal(false);
+
+  toggle() {
+    this.isAnimationStart.update((v) => !v);
+  }
 }
