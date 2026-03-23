@@ -1,3 +1,18 @@
-<button (click)="toggle()">Start / Stop</button>
+<div class="container">
+  <div class="header">
+    <h2>Crushing plant animation</h2>
 
-<app-schema [isAnimationStart]="isAnimationStart()" />
+    <mat-button-toggle-group
+      name="fontStyle"
+      aria-label="Font Style"
+      [value]="service.mode()"
+      (change)="changeMode($event.value)"
+    >
+      <mat-button-toggle value="STEP">Step flow animation</mat-button-toggle>
+      <mat-button-toggle value="RANDOM">API data animation</mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+  <div class="schema">
+    <app-schema />
+  </div>
+</div>

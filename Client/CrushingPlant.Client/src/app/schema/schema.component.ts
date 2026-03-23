@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import {
+  AfterViewInit,
   ChangeDetectorRef,
   Component,
   effect,
@@ -13,7 +14,14 @@ import {
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { EquipmentService } from '../_services/equipment.service';
 import { Equipment } from '../_models/equipment';
-import { defer, delay, timer } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
+import {
+  EquipmentInfoDialog,
+  EquipmentInfoDialogData,
+} from '../modals/equipment-info-dialog/equipment-info-dialog.component';
+import { FlowStep } from '../_models/flowStep';
+import { SvgRenderer } from '../_services/svgRenderer';
+import { AnimationService } from '../_services/animation.service';
 
 @Component({
   selector: 'app-schema',
@@ -22,17 +30,16 @@ import { defer, delay, timer } from 'rxjs';
   styleUrl: './schema.component.scss',
   standalone: true,
 })
-export class SchemaComponent {
+export class SchemaComponent implements AfterViewInit {
   private service = inject(EquipmentService);
-
-  private selectedEquipment = signal<Equipment | null>(null);
-
-  isAnimationStart = input.required<boolean>();
+  private dialog = inject(MatDialog);
 
   svgContent: SafeHtml = '';
 
   @ViewChild('svgContainer') svgContainer!: ElementRef;
 
+  private renderer!: SvgRenderer;
+  private animator!: AnimationService;
   private listenersAttached = false;
 
   constructor(
@@ -41,85 +48,61 @@ export class SchemaComponent {
     private cdr: ChangeDetectorRef,
   ) {
     effect(() => {
-      if (this.isAnimationStart()) {
-        this.service.startFetchingEquipments();
-      } else {
-        this.service.stopFetchingEquipments();
-      }
+      const visual = this.service.visualState();
+      this.renderer?.updateVisualStyles(visual);
     });
 
     effect(() => {
       const map = this.service.equipmentsMap();
-      this.updateSvgStyles(map);
+      this.renderer?.updateEquipmentStyles(map);
+    });
+
+    effect(() => {
+      const flow = this.service.flow();
+      if (!flow) return;
+      this.animator?.animate(flow);
     });
   }
 
-  private updateSvgStyles(map: Record<string, Equipment>) {
-    if (!this.svgContainer) return;
-
-    const container = this.svgContainer.nativeElement;
-
-    for (const [id, equipment] of Object.entries(map)) {
-      const el = container.querySelector(`#${id}`);
-      if (!el) continue;
-
-      this.applyStatusStyle(el, equipment.status);
-    }
-  }
-
-  private applyStatusStyle(el: Element, status: Equipment['status']) {
-    const colors: Record<string, string> = {
-      RUN: '#00c851',
-      OFF: '#aaaaaa',
-      ALARM: '#ff4444',
-    };
-    (el as HTMLElement).style.fill = colors[status];
-  }
-
-  ngAfterViewInit() {
+  ngAfterViewInit(): void {
     this.loadSvg();
   }
 
-  private loadSvg() {
+  private loadSvg(): void {
     this.http.get('df.svg', { responseType: 'text' }).subscribe((svg) => {
       this.svgContent = this.sanitizer.bypassSecurityTrustHtml(svg);
       this.cdr.detectChanges();
+
+      this.renderer = new SvgRenderer(this.svgContainer);
+      this.animator = new AnimationService(this.svgContainer);
 
       this.attachEventListenersOnce();
     });
   }
 
-  private attachEventListenersOnce() {
+  private attachEventListenersOnce(): void {
     if (this.listenersAttached) return;
 
     const container = this.svgContainer.nativeElement;
-    console.log('container HTML:', container.innerHTML);
 
-    Object.entries(this.service.equipmentsMap()).forEach(([id, equipment]) => {
-      console.log('ids:', id);
-      const el = container.querySelector(`#${id}`);
-      console.log('elements:', el);
-      if (!el) return;
+    for (const [id] of Object.entries(this.service.equipmentsMap())) {
+      const el = container.querySelector(`#${id}`) as HTMLElement | null;
+      if (!el) continue;
 
       el.style.cursor = 'pointer';
-
-      el.addEventListener('click', () => this.onElementClick(equipment));
-
+      el.addEventListener('click', () => this.onElementClick(id));
       el.addEventListener(
         'mouseenter',
         () => (el.style.filter = 'brightness(1.3)'),
       );
-
-      el.addEventListener('mouseleave', () => {
-        el.style.filter = '';
-      });
-    });
+      el.addEventListener('mouseleave', () => (el.style.filter = ''));
+    }
 
     this.listenersAttached = true;
   }
 
-  onElementClick(equipment: Equipment) {
-    this.selectedEquipment.set(equipment);
-    console.log(equipment);
+  private onElementClick(svgObjectId: string): void {
+    const data: EquipmentInfoDialogData = { svgObjectId };
+    this.dialog.open(EquipmentInfoDialog, { data });
   }
 }
