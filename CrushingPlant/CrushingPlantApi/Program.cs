@@ -24,12 +24,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors(policy =>
 {
-    policy.WithOrigins("http://localhost:4200")
+    policy.WithOrigins("http://localhost:80", "http://localhost")
            .AllowAnyMethod()
            .AllowCredentials()
            .AllowAnyHeader();
 });
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.MapEquipmentEndpoints();
 

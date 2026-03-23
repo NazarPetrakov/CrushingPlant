@@ -21,7 +21,7 @@ const FETCH_INTERVAL_MS = 5000;
 })
 export class EquipmentService {
   private http = inject(HttpClient);
-  private readonly baseUrl = 'https://localhost:7101';
+  private readonly baseUrl = 'http://localhost:5000';
 
   private _mode = signal<AnimationMode>('RANDOM');
   readonly mode = this._mode.asReadonly();
