@@ -5,5 +5,5 @@
    power_kw smallint NULL,
    feeding_size_mm smallint NULL,
    discharging_size_mm smallint NULL,
-   updated_at timestamp without time zone NOT NULL DEFAULT now()
+   updated_at timestamp with time zone NOT NULL DEFAULT now()
 )

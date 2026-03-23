@@ -3,4 +3,4 @@
 	name character varying (256) NOT NULL,
 	status character varying (64) NOT NULL,
 	type character varying (64) NOT NULL,
-	updated_at timestamp without time zone NOT NULL DEFAULT now())	
+	updated_at timestamp with time zone NOT NULL DEFAULT now())	
