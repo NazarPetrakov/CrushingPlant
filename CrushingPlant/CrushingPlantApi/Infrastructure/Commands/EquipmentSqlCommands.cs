@@ -7,11 +7,26 @@
                 """;
         public static string UpdateStatusesRandomly = """
                 UPDATE equipments
-                SET status = CASE
-                    WHEN random() < 0.5 THEN 'OFF'
-                    WHEN random() < 0.95 THEN 'RUN'
-                    ELSE 'ALARM'
-                END,
+                SET status = 
+                    CASE
+                        WHEN status = 'OFF' THEN 
+                            CASE
+                                WHEN random() < 0.5 THEN 'OFF'
+                                ELSE 'RUN'
+                            END
+                        WHEN status = 'RUN' THEN 
+                            CASE
+                                WHEN random() < 0.8 THEN 'RUN'
+                                ELSE 'ALARM'
+                            END
+                        WHEN status = 'ALARM' THEN 
+                            CASE
+                                WHEN random() < 0.8 THEN 'OFF'
+                                WHEN random() < 0.9 THEN 'ALARM'
+                                ELSE 'RUN'
+                            END
+                        ELSE status
+                    END,
                 updated_at = NOW();
                 """;
         public static string UpdateStatusById = """

@@ -13,11 +13,37 @@ namespace CrushingPlantApi.Infrastructure.Repositories
             _dataSource = dataSource;
         }
 
-        public async Task UpdateConveyersMetricsRandomlyAsync()
+        public async Task UpdateAllMetricsRandomlyAsync()
         {
-            await using var command = _dataSource.CreateCommand(MetricsSqlCommands.UpdateConveyorsRandomly);
+            await using var connection = await _dataSource.OpenConnectionAsync();
+            await using var transaction = await connection.BeginTransactionAsync();
 
-            await command.ExecuteNonQueryAsync();
+            await UpdateBunkersMetricsRandomlyAsync(connection, transaction);
+            await UpdateConveyersMetricsRandomlyAsync(connection, transaction);
+            await UpdateCrushersMetricsRandomlyAsync(connection, transaction);
+
+            await transaction.CommitAsync();
+        }
+        public async Task UpdateConveyersMetricsRandomlyAsync(NpgsqlConnection connection, NpgsqlTransaction transaction)
+        {
+            await using var command1 = new NpgsqlCommand(MetricsSqlCommands.UpdateConveyorsRandomly,
+                connection, transaction);
+
+            await command1.ExecuteNonQueryAsync();
+        }
+        public async Task UpdateCrushersMetricsRandomlyAsync(NpgsqlConnection connection, NpgsqlTransaction transaction)
+        {
+            await using var command1 = new NpgsqlCommand(MetricsSqlCommands.UpdateCrushersRandomly,
+                connection, transaction);
+
+            await command1.ExecuteNonQueryAsync();
+        }
+        public async Task UpdateBunkersMetricsRandomlyAsync(NpgsqlConnection connection, NpgsqlTransaction transaction)
+        {
+            await using var command1 = new NpgsqlCommand(MetricsSqlCommands.UpdateBunkersRandomly,
+                connection, transaction);
+
+            await command1.ExecuteNonQueryAsync();
         }
 
         public async Task<CrusherMetrics?> GetCrusherMetricsAsync(string equipmentId)

@@ -6,33 +6,44 @@ namespace CrushingPlantApi.Services
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ILogger<ChangeEquipmentsService> _logger;
+        private readonly IConfiguration _configuration;
         private int _counter = 0;
 
-        public ChangeEquipmentsService(IServiceScopeFactory scopeFactory, ILogger<ChangeEquipmentsService> logger)
+        public ChangeEquipmentsService(
+            IServiceScopeFactory scopeFactory,
+            ILogger<ChangeEquipmentsService> logger,
+            IConfiguration configuration)
         {
             _scopeFactory = scopeFactory;
             _logger = logger;
+            _configuration = configuration;
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
             {
                 await TryUpdateAsync(UpdateEquipmentsStatus, nameof(UpdateEquipmentsStatus));
-                await TryUpdateAsync(UpdateConveyorsMetrics, nameof(UpdateConveyorsMetrics));
+                await TryUpdateAsync(UpdateAllMetrics, nameof(UpdateAllMetrics));
 
                 _counter++;
 
                 _logger.LogInformation("Update #{Count}", _counter);
 
-                await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
+                if (!Int32.TryParse(_configuration.GetSection("AppConfiguration:UpdateIntervalInSeconds").Value,
+                    out int delay))
+                {
+                    _logger.LogError("Failed to get delay from configuration");
+                }
+
+                await Task.Delay(TimeSpan.FromSeconds(delay), stoppingToken);
             }
         }
-        private async Task UpdateConveyorsMetrics()
+        private async Task UpdateAllMetrics()
         {
             using var scope = _scopeFactory.CreateScope();
             var repository = scope.ServiceProvider.GetRequiredService<MetricsRepository>();
 
-            await repository.UpdateConveyersMetricsRandomlyAsync();
+            await repository.UpdateAllMetricsRandomlyAsync();
         }
         private async Task UpdateEquipmentsStatus()
         {
