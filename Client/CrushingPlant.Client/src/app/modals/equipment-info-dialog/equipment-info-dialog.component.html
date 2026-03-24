@@ -1,0 +1,44 @@
+<h2 mat-dialog-title>{{ equipment()?.name }}</h2>
+<mat-dialog-content>
+  <p>Status: {{ equipment()?.status }}</p>
+
+  @switch (equipment()?.type) {
+    @case ("crusher") {
+      @if (crusherMetrics()) {
+        <p>Temperature: {{ crusherMetrics()?.temperature ?? "0" }} °C</p>
+        <p>Load: {{ crusherMetrics()?.load ?? "0" }} %</p>
+        <p>Power: {{ crusherMetrics()?.power ?? "0" }} kW</p>
+        <p>Feeding Size: {{ crusherMetrics()?.feedingSize ?? "-" }} mm</p>
+        <p>Discharge Size: {{ crusherMetrics()?.dischargeSize ?? "-" }} mm</p>
+        <p>
+          Last updated: {{ crusherMetrics()?.metricsUpdatedAt | date: "short" }}
+        </p>
+      }
+    }
+    @case ("conveyor") {
+      @if (conveyorMetrics()) {
+        <p>Speed: {{ conveyorMetrics()?.speed ?? "0" }} m/s</p>
+        <p>
+          Last updated:
+          {{ conveyorMetrics()?.metricsUpdatedAt | date: "short" }}
+        </p>
+      }
+    }
+    @case ("bunker") {
+      @if (bunkerMetrics()) {
+        <p>Level: {{ bunkerMetrics()?.level ?? "0" }} %</p>
+        <p>Capacity: {{ bunkerMetrics()?.capacity ?? "-" }} t</p>
+        <p>
+          Last updated: {{ bunkerMetrics()?.metricsUpdatedAt | date: "short" }}
+        </p>
+      }
+    }
+    @default {
+      <p>No metrics available for this equipment type.</p>
+    }
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-flat-button (click)="onNoClick()">Close</button>
+</mat-dialog-actions>
